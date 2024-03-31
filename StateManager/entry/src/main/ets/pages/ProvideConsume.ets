@@ -1,4 +1,4 @@
-@Entry
+﻿@Entry
 @Component
 struct PCPage {
 
@@ -49,6 +49,5 @@ struct ItemList {
         }
       )
     }
-
   }
 }

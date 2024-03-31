@@ -76,7 +76,7 @@ struct StateTask {
             ListItem() {
               Row(){
                 Text(item.name)
-                  .fontSize(20)
+                    .fontSize(20)
                 Checkbox()
                   .select(item.finished)
                   .onChange((val)=>{

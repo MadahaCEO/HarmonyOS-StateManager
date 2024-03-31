@@ -1,5 +1,13 @@
-import {Task} from "../common/Common"
 
+@Observed
+class Task {
+  // 静态变量，当前类的所有对象共享，无论创建多少个Task对象
+  static id: number = 1
+  // 任务名称
+  name: string = `任务 ${Task.id++}`
+  // 任务是否完成
+  finished: boolean = false
+}
 
 /* @Styles重用样式函数
  * 将多条样式设置提炼成⼀个方法，直接在组件声明的位置调用。
@@ -31,7 +39,7 @@ import {Task} from "../common/Common"
 
 @Entry
 @Component
-struct PropLinkTask {
+struct ObservedObjectLinkTask {
 
   @State totalTask: number = 0
   @State finishTask: number = 0
@@ -129,25 +137,14 @@ struct TaskList {
           this.tasks,
           (item: Task, idx) => {
             ListItem() {
-              Row(){
-                Text(item.name)
-                  .fontSize(20)
-                Checkbox()
-                  .select(item.finished)
-                  .onChange((val)=>{
-                    item.finished = val
-                    this.handleTasks()
-                    /*
-                    if (val) {
-                      this.finishTask++
-                    } else {
-                      this.finishTask--
-                    }
-                    */
-                  })
-              }
-              .card()
-              .justifyContent(FlexAlign.SpaceBetween)
+              /*
+               * bind 把当前父组件的this传递给子组件，这样当执行handleTasks函数时，
+               * 里面的this永远是父组件的this，这样才能调用父组件的属性变量
+               *
+               * 如果没有.bind(this)，那么当handleTasks传递给子组件，子组件调用时，
+               * 里面的this实际上是子组件，而子组件并没有父组件的属性变量（totalTask和finishTask），所以会报错
+               * */
+              RowItem({task:item, onTaskChanged: this.handleTasks.bind(this)})
             }
             .swipeAction({end: this.deleteBtn(idx)})
           }
@@ -175,5 +172,36 @@ struct TaskList {
         this.tasks.splice(idx,1)
         this.handleTasks()
       })
+  }
+}
+
+
+@Component
+struct RowItem {
+
+  @ObjectLink task: Task
+  onTaskChanged: () => void
+
+  build() {
+    Row(){
+      if (this.task.finished) {
+        Text(this.task.name)
+          .fontSize(20)
+          .decoration({type: TextDecorationType.LineThrough})
+          .fontColor(ColorMode.LIGHT)
+      } else {
+        Text(this.task.name)
+          .fontSize(20)
+      }
+
+      Checkbox()
+        .select(this.task.finished)
+        .onChange((val)=>{
+          this.task.finished = val
+          this.onTaskChanged()
+        })
+    }
+    .card()
+    .justifyContent(FlexAlign.SpaceBetween)
   }
 }
