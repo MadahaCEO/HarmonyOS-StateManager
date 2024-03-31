@@ -1,6 +1,8 @@
 {
   "src": [
     "pages/Index",
-    "pages/State"
+    "pages/State",
+    "pages/StateTask",
+    "pages/PropLink"
   ]
 }
