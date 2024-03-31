@@ -5,8 +5,8 @@ import router from '@ohos.router';
 struct Index {
   @State message: string = 'Hello World'
 
-  private arr: String[] = ['@State','@Prop & @Link',' @Provide & @Consume','@Observed & @ObjectLink']
-  private pages: string[] = ['pages/State']
+  private arr: String[] = ['@State','@StateTask','@Prop & @Link',' @Provide & @Consume','@Observed & @ObjectLink']
+  private pages: string[] = ['pages/State','pages/StateTask','pages/PropLink','pages/ProvideConsume']
 
   build() {
     Column({space: 20}) {

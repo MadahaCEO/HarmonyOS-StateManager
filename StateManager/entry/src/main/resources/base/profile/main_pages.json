@@ -3,6 +3,7 @@
     "pages/Index",
     "pages/State",
     "pages/StateTask",
-    "pages/PropLink"
+    "pages/PropLink",
+    "pages/ProvideConsume"
   ]
 }

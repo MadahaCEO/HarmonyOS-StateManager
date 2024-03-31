@@ -1,12 +1,5 @@
+import {Task} from "../common/Common"
 
-class Task {
-  // 静态变量，当前类的所有对象共享，无论创建多少个Task对象
-  static id: number = 1
-  // 任务名称
-  name: string = `任务 ${Task.id++}`
-  // 任务是否完成
-  finished: boolean = false
-}
 
 /* @Styles重用样式函数
  * 将多条样式设置提炼成⼀个方法，直接在组件声明的位置调用。
@@ -42,6 +35,86 @@ struct PropLinkTask {
 
   @State totalTask: number = 0
   @State finishTask: number = 0
+  // @State tasks: Task[] = []
+
+  // handleTasks() {
+  //
+  //   this.totalTask = this.tasks.length
+  //   this.finishTask = this.tasks.filter(item => item.finished).length
+  //
+  // }
+
+  build() {
+    Column({space: 10}) {
+      // 1.任务进度卡片
+      TaskHeader({finishTask: this.finishTask, totalTask: this.totalTask})
+
+      // 2.任务列表
+      // A '@Link' decorated attribute must be initialized with '$'. <etsLint>
+      TaskList({finishTask: $finishTask, totalTask: $totalTask})
+
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor('#F1F2F3')
+  }
+}
+
+@Component
+struct TaskHeader {
+
+  /* 父组件 @State  子组件 @Prop
+   * prop 修饰属性 不可以初始化给默认值
+   * 单向同步
+   * 当父组件属性更新，会触发子组件视图刷新
+   * 实际上是父组件的数据拷贝的一份传递给子组件，每次父组件数据改变都会拷贝一份新的数据给子组件
+   * 所以子组件不论如何修改属性都对父组件无影响
+   * */
+  /*
+   * Variables decorated by '@Prop', '@Link', '@Consume',
+   * and '@ObjectLink' cannot be initialized locally. <etsLint>
+   * */
+  @Prop finishTask: number
+  @Prop totalTask: number
+
+  build() {
+    Row() {
+      Text('任务进度: ')
+        .fontSize(30)
+        .fontWeight(FontWeight.Bold)
+      Stack() {
+        Progress({
+          value: this.finishTask,
+          total: this.totalTask,
+          type: ProgressType.Ring
+        })
+          .width(100)
+        Row() {
+          Text(this.finishTask.toString())
+            .fontSize(24)
+            .fontColor('#36D')
+          Text(' / ' + this.totalTask.toString())
+            .fontSize(24)
+        }
+      }
+    }
+    .card()
+    .margin({top: 20,bottom: 10})
+    .justifyContent(FlexAlign.SpaceEvenly)
+  }
+}
+
+@Component
+struct TaskList {
+
+  /* 父组件 @State  子组件 @Link
+  * Link 修饰属性 不可以初始化给默认值
+  * 双向同步
+  * 当父组件属性更新，会触发子组件视图刷新，反之，亦然
+  * 实际上是父组件的数据传递引用给给子组件，所以不论谁如何修改属性，相互都刷新
+  * */
+  @Link finishTask: number
+  @Link totalTask: number
   @State tasks: Task[] = []
 
   handleTasks() {
@@ -51,43 +124,14 @@ struct PropLinkTask {
 
   }
 
-
-
   build() {
-    Column({space: 10}) {
-      // 1.任务进度卡片
-      Row() {
-        Text('任务进度: ')
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-        Stack() {
-          Progress({
-            value: this.finishTask,
-            total: this.totalTask,
-            type: ProgressType.Ring
-          })
-            .width(100)
-          Row() {
-              Text(this.finishTask.toString())
-                .fontSize(24)
-                .fontColor('#36D')
-              Text(' / ' + this.totalTask.toString())
-                .fontSize(24)
-            }
-        }
-      }
-      .card()
-      .margin({top: 20,bottom: 10})
-      .justifyContent(FlexAlign.SpaceEvenly)
-
-      // 2.新增任务按钮
+    Column() {
       Button('新增任务').onClick((event: ClickEvent) => {
         this.tasks.push(new Task())
         this.handleTasks()
       })
         .width(200)
-
-      // 3.任务列表
+        .margin({bottom: 20})
       List({space: 10}) {
         ForEach(
           this.tasks,
@@ -120,11 +164,7 @@ struct PropLinkTask {
       .width('100%')
       .layoutWeight(1)
       .alignListItem(ListItemAlign.Center)
-
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor('#F1F2F3')
   }
 
   /* 组件内自定义构建函数，UI元素复用机制 @Builder
@@ -142,6 +182,6 @@ struct PropLinkTask {
         // splice(start: number, deleteCount?: number): T[];
         this.tasks.splice(idx,1)
         this.handleTasks()
-    })
+      })
   }
 }
