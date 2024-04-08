@@ -4,6 +4,9 @@
     "pages/State",
     "pages/StateTask",
     "pages/PropLink",
-    "pages/ProvideConsume"
+    "pages/ProvideConsume",
+    "pages/ObservedObjectLink",
+    "pages/Navigation",
+    "pages/NavNextPage"
   ]
 }
